@@ -11,8 +11,11 @@ require 'execjs'
 require 'nokogumbo'
 
 react = File.expand_path('../vendor/react-with-addons.min.js', __FILE__)
-
 Wunderbar::Asset.script name: 'react-min.js', file: react, react: true
+
+reactdom = File.expand_path('../vendor/react-dom.min.js', __FILE__)
+Wunderbar::Asset.script name: 'react-dom.min.js', file: reactdom, react: true,
+  server: File.expand_path('../vendor/react-dom-server.min.js', __FILE__)
 
 class Wunderbar::Asset
   @@cached_scripts = {}
@@ -39,7 +42,7 @@ class Wunderbar::XmlMarkup
     # compute base
     base = root.at('base')
     base = base && base.attrs[:href]
-    base ||= File.dirname(@_scope.env['REQUEST_URI']).chomp('/') + '/'
+    base ||= @_scope.env['REQUEST_URI'][/.*\//]
 
     _base = @_scope.env['HTTP_X_WUNDERBAR_BASE']
     base = base[_base.length..-1] if _base and base.start_with? _base
@@ -70,8 +73,8 @@ class Wunderbar::XmlMarkup
 
     # build client and server scripts
     common = Ruby2JS.convert(block, scope: @_scope, react: true)
-    server = "React.renderToString(#{common})"
-    client = "React.render(#{common}, #{element})"
+    server = "ReactDOMServer.renderToString(#{common})"
+    client = "ReactDOM.render(#{common}, #{element})"
 
     # extract content of scripts
     scripts.map! do |script|
@@ -110,8 +113,12 @@ class Wunderbar::XmlMarkup
         if script.contents
           scripts.unshift script.contents
         elsif script.path
-          scripts.unshift File.read(
-            File.expand_path(script.path, Wunderbar::Asset.root))
+          if script.path.start_with? '/'
+            path = (ENV['DOCUMENT_ROOT'] + script.path).untaint
+          else
+            path = File.expand_path(script.path, Wunderbar::Asset.root)
+          end
+          setup << File.read(script.options[:server] || path)
         end
       end
 
@@ -143,7 +150,7 @@ class Ruby2JS::Serializer
   end
 end
 
-get %r{^/([-\w]+)\.js$} do |script|
+get %r{/([-\w]+)\.js} do |script|
   file = File.join(settings.views, "#{script}.js.rb")
   begin
     js = Wunderbar::Asset.convert(file)
@@ -162,13 +169,13 @@ get %r{^/([-\w]+)\.js$} do |script|
   js.to_s
 end
 
-get %r{^/((?:\w+\/)*[-\w]+)\.js.rb$} do |script|
+get %r{/((?:\w+\/)*[-\w]+)\.js.rb} do |script|
   file = File.join(settings.views, "#{script}.js.rb")
   pass unless File.exist? file
   send_file file
 end
 
-get %r{^/([-\w]+)\.js.map$} do |script|
+get %r{/([-\w]+)\.js.map} do |script|
   file = File.join(settings.views, "#{script}.js.rb")
   js = Wunderbar::Asset.convert(file)
   pass unless js
