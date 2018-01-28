@@ -171,15 +171,21 @@ module Wunderbar
     end
 
     def text! text
-      @node.children << TextNode.new(text)
+      text = TextNode.new(text)
+      @node.children << text
+      text
     end
 
     def declare! *args
-      @node.children << DocTypeNode.new(*args)
+      doctype = DocTypeNode.new(*args)
+      @node.children << doctype
+      doctype
     end
 
     def comment! text
-      @node.children << CommentNode.new(text)
+      comment = CommentNode.new(text)
+      @node.children << comment
+      comment
     end
 
     def indented_text!(text)
@@ -188,6 +194,7 @@ module Wunderbar
       text.extend SpacedNode if @spaced
       @node.children << text
       @spaced = false
+      text
     end
 
     def target!
@@ -291,8 +298,6 @@ module Wunderbar
     def system(*args)
       opts = {}
       opts = args.pop if Hash === args.last
-      command = args
-      command = args.first if args.length == 1 and Array === args.first
 
       tag  = opts[:tag]  || 'pre'
       output_class = opts[:class] || {}
@@ -452,8 +457,6 @@ module Wunderbar
     def system(*args)
       opts = {}
       opts = args.pop if Hash === args.last
-      command = args
-      command = args.first if args.length == 1 and Array === args.first
 
       output_prefix = opts[:prefix] || {}
       output_prefix[:stdin]  ||= '$ '
@@ -573,8 +576,6 @@ module Wunderbar
     def system(*args)
       opts = {}
       opts = args.pop if Hash === args.last
-      command = args
-      command = args.first if args.length == 1 and Array === args.first
 
       transcript = opts[:transcript]  || 'transcript'
       output_prefix = opts[:prefix] || {}

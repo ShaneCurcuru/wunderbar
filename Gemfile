@@ -4,9 +4,8 @@ gem 'json', ('~> 1.8' if RUBY_VERSION < '2')
 
 group :test do
   gem 'rake'
-  if RUBY_VERSION =~ /^1|^2\.0/
-    gem 'nokogiri', '~> 1.6.8'
-  end
+  gem 'nokogiri', ('~> 1.6.8' if RUBY_VERSION =~ /^1|^2\.0/)
+
   if RUBY_VERSION =~ /^1|^2\.[01]/
     gem 'sinatra', '~> 1.4'
   else
@@ -14,11 +13,18 @@ group :test do
     gem 'sinatra', '~> 2.0'
     gem 'rails', '~> 5.0'
   end
+
   gem 'nokogumbo'
   gem 'ruby2js'
   gem 'sourcify'
   gem 'coffee-script'
-  gem 'kramdown'
+
+  if RUBY_VERSION =~ /^1/
+    gem 'kramdown', '~> 1.14.0'
+  else
+    gem 'kramdown'
+  end
+
   gem 'coderay'
   gem 'sanitize'
   gem 'minitest'

@@ -17,19 +17,6 @@ number of extensions.  Including an extension is generally as simple as
 Following is a brief description of each of the extensions included with
 Wunderbar.
 
-angularjs
----
-
-This extension adds a link statement to the [Angularjs](http://angularjs.org/)
-JavaScript library.  If you require `angularjs/resource` or `angularjs/route`,
-you those libraries too.
-
-It also pulls in the script extension and the supporting Ruby2JS filters for
-the relevant Angularjs library/libraries.
-
-Demo:
-* [angularjs](https://github.com/rubys/wunderbar/blob/master/demo/angularjs.rb)
-
 coderay
 ---
 
@@ -126,8 +113,7 @@ To use, add the following to your `Gemfile`:
 
 Depending on what other features you use, you may need to add additional lines
 to your Gemfile (example: `gem 'ruby2js'`), or create a
-`config/initializes/wunderbar.rb` with additional requires (e.g., `require
-ruby2js
+`config/initializers/wunderbar.rb` with additional requires (e.g., `require 'ruby2js'`).
 
 
 script
@@ -159,7 +145,6 @@ etcetera.
 
 Demos:
 * [hellosinatra](https://github.com/rubys/wunderbar/blob/master/demo/hellosinatra.rb)
-* [angularjs](https://github.com/rubys/wunderbar/blob/master/demo/angularjs.rb)
 
 websocket
 ---
